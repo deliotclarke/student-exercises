@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StudentExercises
 {
@@ -129,7 +131,7 @@ namespace StudentExercises
             Instructor3.AssignExercise(Student2, EnglishIdioms);
             Instructor3.AssignExercise(Student4, HowManySocks);
 
-            Instructor4.AssignExercise(Student3, KandyKorner);
+            Instructor4.AssignExercise(Student1, KandyKorner);
             Instructor4.AssignExercise(Student2, TreeChallenge);
 
             List<Student> students = new List<Student>(){
@@ -138,6 +140,14 @@ namespace StudentExercises
 
             List<Exercise> exercises = new List<Exercise>(){
                 ChickenMonkey, TreeChallenge, StudentExercises, EnglishIdioms, HowManySocks, KandyKorner
+            };
+
+            List<Cohort> cohorts = new List<Cohort>() {
+                Cohort10, Cohort32, Cohort34, Cohort35
+            };
+
+            List<Instructor> instructors = new List<Instructor>() {
+                Instructor1, Instructor2, Instructor3, Instructor4
             };
 
             exercises.ForEach(exe =>
@@ -158,6 +168,57 @@ namespace StudentExercises
                 });
             });
             Console.WriteLine();
+
+            IEnumerable<Exercise> jsExercises =
+                from exercise in exercises
+                where exercise.Language == "Javascript"
+                select exercise;
+
+            IEnumerable<Student> students32 =
+                from student in students
+                where student.Cohort == 32
+                select student;
+
+            IEnumerable<Instructor> instructors32 =
+                from instructor in instructors
+                where instructor.Cohort == 32
+                select instructor;
+
+            List<Student> orderedStudents = students.OrderBy(n => n.LastName).ToList();
+
+            IEnumerable<Student> newStudents =
+                from student in students
+                where student.CurrentExercises.Count == 0
+                select student;
+
+            Student busyStudent = students.OrderByDescending(n => n.CurrentExercises.Count).ToList()[0];
+
+            var cohortCount =
+                from student in students
+                join cohort in cohorts on student.Cohort equals cohort.CohortId
+                group student by student.Cohort into cohortGroup
+
+                //unecessary list, but still cool that you can just make a list on the fly with LET
+                let studentList = cohortGroup
+                select new
+                {
+                    Cohort = cohortGroup.Key,
+                    studentList = studentList
+                };
+
+
+
+            foreach (var group in cohortCount)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"There are {group.studentList.Count()} in Cohort {group.Cohort}:");
+                foreach (var student in group.studentList)
+                {
+                    Console.WriteLine($"{student.FirstName} {student.LastName}");
+                }
+
+            }
+
         }
     }
 }
